@@ -1,0 +1,130 @@
+// prisma/schema.prisma
+// ─── Database: PostgreSQL via Prisma ORM ─────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Trip: top-level user request ────────────────────────────────────────────
+model Trip {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Core inputs
+  destination String
+  startDate   DateTime
+  endDate     DateTime
+  budget      Int      // USD total
+  travelers   Int
+  travelStyle String   // "budget" | "comfort" | "luxury"
+  interests   String[] // ["food", "museums", "adventure", ...]
+
+  // Generated output
+  itinerary   Itinerary?
+
+  // Future: userId String (for auth)
+  // Future: userId for user relationship
+
+  @@map("trips")
+}
+
+// ─── Itinerary: AI-generated plan ────────────────────────────────────────────
+model Itinerary {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tripId    String   @unique
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  summary   String   // AI overview paragraph
+  totalCost Int      // Estimated total cost in USD
+  currency  String   @default("USD")
+  days      Day[]
+
+  @@map("itineraries")
+}
+
+// ─── Day: single day plan ────────────────────────────────────────────────────
+model Day {
+  id          String   @id @default(cuid())
+  dayNumber   Int
+  date        DateTime
+  theme       String   // e.g. "Old City & History"
+  summary     String
+  estimatedCost Int
+
+  itineraryId String
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+
+  activities  Activity[]
+  meals       Meal[]
+  transport   Transport[]
+
+  @@map("days")
+}
+
+// ─── Activity ─────────────────────────────────────────────────────────────────
+model Activity {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  category    String   // "museum" | "attraction" | "adventure" | "shopping" | "nature"
+  startTime   String   // "09:00"
+  endTime     String   // "11:30"
+  duration    Int      // minutes
+  cost        Int      // per person USD
+  address     String?
+  lat         Float?
+  lng         Float?
+  tips        String?
+  imageUrl    String?
+
+  dayId       String
+  day         Day      @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  @@map("activities")
+}
+
+// ─── Meal ─────────────────────────────────────────────────────────────────────
+model Meal {
+  id          String   @id @default(cuid())
+  name        String   // Restaurant name
+  type        String   // "breakfast" | "lunch" | "dinner"
+  cuisine     String
+  description String
+  priceRange  String   // "$" | "$$" | "$$$" | "$$$$"
+  cost        Int      // per person USD
+  address     String?
+  lat         Float?
+  lng         Float?
+  rating      Float?
+  tips        String?
+
+  dayId       String
+  day         Day      @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  @@map("meals")
+}
+
+// ─── Transport ────────────────────────────────────────────────────────────────
+model Transport {
+  id          String   @id @default(cuid())
+  type        String   // "taxi" | "metro" | "walk" | "bus" | "ferry"
+  from        String
+  to          String
+  duration    Int      // minutes
+  cost        Int      // total for group USD
+  notes       String?
+
+  dayId       String
+  day         Day      @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  @@map("transport")
+}
