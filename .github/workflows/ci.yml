@@ -1,0 +1,37 @@
+name: CI
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    name: Type check + lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run type-check
+      - run: npm run lint
+
+  build:
+    name: Production build
+    runs-on: ubuntu-latest
+    needs: check
+    env:
+      DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+      NEXT_PUBLIC_APP_URL: "https://example.com"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run build

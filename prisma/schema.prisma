@@ -1,0 +1,132 @@
+// prisma/schema.prisma — Production-ready schema with indexes
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Trip {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  destination String
+  startDate   DateTime
+  endDate     DateTime
+  budget      Int
+  travelers   Int
+  travelStyle String
+  interests   String[]
+
+  itinerary   Itinerary?
+
+  // ── Indexes for common query patterns ───────────────────────────────────────
+  @@index([destination])           // filter by destination
+  @@index([createdAt])             // chronological feeds
+  @@index([travelStyle])           // style analytics
+  @@index([startDate, endDate])    // date-range queries
+  @@map("trips")
+}
+
+model Itinerary {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tripId    String   @unique
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  summary   String
+  totalCost Int
+  currency  String   @default("USD")
+  days      Day[]
+
+  @@index([tripId])
+  @@index([createdAt])
+  @@map("itineraries")
+}
+
+model Day {
+  id            String   @id @default(cuid())
+  dayNumber     Int
+  date          DateTime
+  theme         String
+  summary       String
+  estimatedCost Int
+
+  itineraryId   String
+  itinerary     Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+
+  activities    Activity[]
+  meals         Meal[]
+  transport     Transport[]
+
+  @@index([itineraryId])
+  @@index([itineraryId, dayNumber])  // fetch specific day efficiently
+  @@map("days")
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  category    String
+  startTime   String
+  endTime     String
+  duration    Int
+  cost        Int
+  address     String?
+  lat         Float?
+  lng         Float?
+  tips        String?
+  imageUrl    String?
+
+  dayId       String
+  day         Day      @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  @@index([dayId])
+  @@index([category])          // filter by activity type
+  @@map("activities")
+}
+
+model Meal {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  cuisine     String
+  description String
+  priceRange  String
+  cost        Int
+  address     String?
+  lat         Float?
+  lng         Float?
+  rating      Float?
+  tips        String?
+
+  dayId       String
+  day         Day      @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  @@index([dayId])
+  @@index([type])              // filter breakfast/lunch/dinner
+  @@map("meals")
+}
+
+model Transport {
+  id       String @id @default(cuid())
+  type     String
+  from     String
+  to       String
+  duration Int
+  cost     Int
+  notes    String?
+
+  dayId    String
+  day      Day    @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  @@index([dayId])
+  @@map("transport")
+}
