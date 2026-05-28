@@ -13,7 +13,7 @@ const FEATURES = [
 ];
 
 export function Features() {
-  const [visible, setVisible] = useState<boolean[]>(new Array(FEATURES.length).fill(false));
+  const [visible, setVisible] = useState<boolean[]>(new Array(FEATURES.length).fill(true));
   const refs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export function Features() {
       const obs = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            setTimeout(() => setVisible((v) => { const n = [...v]; n[i] = true; return n; }), i * 80);
+            setVisible((v) => { const n = [...v]; n[i] = true; return n; });
             obs.disconnect();
           }
         },

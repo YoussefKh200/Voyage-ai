@@ -9,14 +9,8 @@ const ROTATING_WORDS = ["journey", "adventure", "escape", "story"];
 
 export function Hero() {
   const [wordIndex, setWordIndex] = useState(0);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [wordVisible, setWordVisible] = useState(true);
-
-  useEffect(() => {
-    // Stagger entrance on mount
-    const t = setTimeout(() => setVisible(true), 80);
-    return () => clearTimeout(t);
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {

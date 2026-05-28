@@ -9,10 +9,7 @@ export function UserMenu() {
   const { session, loading, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  if (loading) {
-    return <div className="h-9 w-32 rounded-full bg-white/5 animate-pulse" />;
-  }
-
+  // Show login/signup buttons by default (don't wait for loading)
   if (!session) {
     return (
       <div className="flex items-center gap-3">

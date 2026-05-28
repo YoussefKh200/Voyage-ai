@@ -43,8 +43,8 @@ const STEPS = [
 ];
 
 export function HowItWorks() {
-  const [visibleSteps, setVisibleSteps] = useState<boolean[]>(new Array(STEPS.length).fill(false));
-  const [lineProgress, setLineProgress] = useState(0);
+  const [visibleSteps, setVisibleSteps] = useState<boolean[]>(new Array(STEPS.length).fill(true));
+  const [lineProgress, setLineProgress] = useState(1);
   const refs = useRef<(HTMLDivElement | null)[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -55,10 +55,8 @@ export function HowItWorks() {
       const obs = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            setTimeout(() => {
-              setVisibleSteps((v) => { const n = [...v]; n[i] = true; return n; });
-              setLineProgress((i + 1) / STEPS.length);
-            }, i * 150);
+            setVisibleSteps((v) => { const n = [...v]; n[i] = true; return n; });
+            setLineProgress((i + 1) / STEPS.length);
             obs.disconnect();
           }
         },

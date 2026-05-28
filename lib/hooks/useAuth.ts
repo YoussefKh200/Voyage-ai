@@ -13,7 +13,12 @@ export function useAuth() {
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const res = await fetch("/api/auth/session");
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+        
+        const res = await fetch("/api/auth/session", { signal: controller.signal });
+        clearTimeout(timeout);
+        
         const data = await res.json();
         setSession(data.session);
       } catch {
