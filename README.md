@@ -2,7 +2,7 @@
 
 > Plan smarter. Travel deeper.
 
-A full-stack, startup-grade AI travel planning application. Generates complete, personalised day-by-day itineraries in under 30 seconds — with restaurants, activities, transport, budget tracking, and local hidden gems. Built to handle millions of users.
+A full-stack, AI travel planning application. Generates complete, personalised day-by-day itineraries in under 30 seconds — with restaurants, activities, transport, budget tracking, and local hidden gems. Built to handle millions of users.
 
 ---
 
