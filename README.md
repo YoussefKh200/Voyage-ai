@@ -1,4 +1,4 @@
-# 🌍 Voyage AI — Production-Ready AI Travel Planner
+# 🌍 Voyage AI — AI Travel Planner
 
 > Plan smarter. Travel deeper.
 
